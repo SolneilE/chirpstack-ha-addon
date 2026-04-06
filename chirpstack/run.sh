@@ -140,26 +140,26 @@ tomlq -it \
 # Enable MQTT integration
 tomlq -it '.integration.enabled=["mqtt"]' /tmp/chirpstack.toml
 
-# Enable eu868 region
-tomlq -it '.network.enabled_regions=["eu868"]' /tmp/chirpstack.toml
+# Enable us915_1 region
+tomlq -it '.network.enabled_regions=["us915_1"]' /tmp/chirpstack.toml
 
 
 
 # ---------------------------------------------------------------------------
-# Regions - configured in separate eu868.toml file
+# Regions - configured in separate us915_1.toml file
 # ---------------------------------------------------------------------------
 
-# Create EU868 region configuration file  
-cat > /config/chirpstack/region_eu868.toml << 'EOF'
-# This file contains EU868 configuration.
+# Create us915_1 region configuration file  
+cat > /config/chirpstack/region_us915_1.toml << 'EOF'
+# This file contains us915_1 configuration.
 [[regions]]
 
   # Name is an user-defined identifier for this region.
-  name="eu868"
+  name="us915_1"
 
   # Common-name refers to the common-name of this region as defined by
   # the LoRa Alliance.
-  common_name="EU868"
+  common_name="US915"
 
 
   # Gateway configuration.
@@ -181,10 +181,10 @@ cat > /config/chirpstack/region_eu868.toml << 'EOF'
       [regions.gateway.backend.mqtt]
 
         # Event topic template.
-        event_topic="eu868/gateway/+/event/+"
+        event_topic="us915_1/gateway/+/event/+"
 
         # Command topic template.
-        command_topic="eu868/gateway/{{ gateway_id }}/command/{{ command }}"
+        command_topic="us915_1/gateway/{{ gateway_id }}/command/{{ command }}"
 
         # MQTT server (e.g. scheme://host:port where scheme is tcp, ssl or ws)
         server="tcp://localhost:1883"
@@ -238,66 +238,59 @@ cat > /config/chirpstack/region_eu868.toml << 'EOF'
     # Note: this configuration is only used in case the gateway is using the
     # ChirpStack Concentratord daemon. In any other case, this configuration 
     # is ignored.
-    [[regions.gateway.channels]]
-      frequency=868100000
+[[regions.gateway.channels]]
+      frequency=902300000
       bandwidth=125000
       modulation="LORA"
-      spreading_factors=[7, 8, 9, 10, 11, 12]
+      spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=868300000
+      frequency=902500000
       bandwidth=125000
       modulation="LORA"
-      spreading_factors=[7, 8, 9, 10, 11, 12]
+      spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=868500000
+      frequency=902700000
       bandwidth=125000
       modulation="LORA"
-      spreading_factors=[7, 8, 9, 10, 11, 12]
+      spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=867100000
+      frequency=902900000
       bandwidth=125000
       modulation="LORA"
-      spreading_factors=[7, 8, 9, 10, 11, 12]
+      spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=867300000
+      frequency=903100000
       bandwidth=125000
       modulation="LORA"
-      spreading_factors=[7, 8, 9, 10, 11, 12]
+      spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=867500000
+      frequency=903300000
       bandwidth=125000
       modulation="LORA"
-      spreading_factors=[7, 8, 9, 10, 11, 12]
+      spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=867700000
+      frequency=903500000
       bandwidth=125000
       modulation="LORA"
-      spreading_factors=[7, 8, 9, 10, 11, 12]
+      spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=867900000
+      frequency=903700000
       bandwidth=125000
       modulation="LORA"
-      spreading_factors=[7, 8, 9, 10, 11, 12]
-  
-    [[regions.gateway.channels]]
-      frequency=868300000
-      bandwidth=250000
-      modulation="LORA"
-      spreading_factors=[7]
-    
-    [[regions.gateway.channels]]
-      frequency=868800000
-      bandwidth=125000
-      modulation="FSK"
-      datarate=50000
+      spreading_factors=[7, 8, 9, 10]
 
+    [[regions.gateway.channels]]
+      frequency=903000000
+      bandwidth=500000
+      modulation="LORA"
+      spreading_factors=[8]
 
   # Region specific network configuration.
   [regions.network]
@@ -325,10 +318,10 @@ cat > /config/chirpstack/region_eu868.toml << 'EOF'
     rx1_dr_offset=0
 
     # RX2 data-rate
-    rx2_dr=0
-
+    rx2_dr=8
+    
     # RX2 frequency (Hz)
-    rx2_frequency=869525000
+    rx2_frequency=923300000
 
     # Prefer RX2 on RX1 data-rate less than.
     #
@@ -361,7 +354,7 @@ cat > /config/chirpstack/region_eu868.toml << 'EOF'
     min_dr=0
 
     # Maximum data-rate.
-    max_dr=5
+    max_dr=3
 
 
     # Rejoin-request configuration (LoRaWAN 1.1)
@@ -397,30 +390,7 @@ cat > /config/chirpstack/region_eu868.toml << 'EOF'
 
     # Below is the common set of extra channels. Please make sure that these
     # channels are also supported by the gateways.
-    [[regions.network.extra_channels]]
-    frequency=867100000
-    min_dr=0
-    max_dr=5
-
-    [[regions.network.extra_channels]]
-    frequency=867300000
-    min_dr=0
-    max_dr=5
-
-    [[regions.network.extra_channels]]
-    frequency=867500000
-    min_dr=0
-    max_dr=5
-
-    [[regions.network.extra_channels]]
-    frequency=867700000
-    min_dr=0
-    max_dr=5
-
-    [[regions.network.extra_channels]]
-    frequency=867900000
-    min_dr=0
-    max_dr=5
+   
 
 EOF
 
@@ -428,17 +398,17 @@ EOF
 tomlq -it \
   --arg srv "$mqtt_server" \
   '.regions[0].gateway.backend.mqtt.server=$srv' \
-  /config/chirpstack/region_eu868.toml
+  /config/chirpstack/region_us915_1.toml
 
 tomlq -it \
   --arg un "$mqtt_username" \
   '.regions[0].gateway.backend.mqtt.username=$un' \
-  /config/chirpstack/region_eu868.toml
+  /config/chirpstack/region_us915_1.toml
 
 tomlq -it \
   --arg pw "$mqtt_password" \
   '.regions[0].gateway.backend.mqtt.password=$pw' \
-  /config/chirpstack/region_eu868.toml
+  /config/chirpstack/region_us915_1.toml
 
 # ---------------------------------------------------------------------------
 # SAVE FINAL CHIRPSTACK CONFIG
@@ -448,8 +418,8 @@ cp /tmp/chirpstack.toml /config/chirpstack/chirpstack.toml
 bashio::log.info "Generated chirpstack.toml:"
 cat /config/chirpstack/chirpstack.toml
 
-bashio::log.info "Generated region_eu868.toml:"
-cat /config/chirpstack/region_eu868.toml
+bashio::log.info "Generated region_us915_1.toml:"
+cat /config/chirpstack/region_us915_1.toml
 
 
 # ==============================================================================
@@ -460,10 +430,10 @@ if bashio::var.true "$basic_station_enabled" || bashio::var.true "$packet_forwar
 
     /usr/local/bin/chirpstack-gateway-bridge configfile > /tmp/chirpstack-gateway-bridge.toml
 
-    # Update topic templates to include eu868 prefix to match ChirpStack expectations
-    tomlq -it '.integration.mqtt.event_topic_template="eu868/gateway/{{ .GatewayID }}/event/{{ .EventType }}"' /tmp/chirpstack-gateway-bridge.toml
-    tomlq -it '.integration.mqtt.state_topic_template="eu868/gateway/{{ .GatewayID }}/state/{{ .StateType }}"' /tmp/chirpstack-gateway-bridge.toml
-    tomlq -it '.integration.mqtt.command_topic_template="eu868/gateway/{{ .GatewayID }}/command/#"' /tmp/chirpstack-gateway-bridge.toml
+    # Update topic templates to include us915_1 prefix to match ChirpStack expectations
+    tomlq -it '.integration.mqtt.event_topic_template="us915_1/gateway/{{ .GatewayID }}/event/{{ .EventType }}"' /tmp/chirpstack-gateway-bridge.toml
+    tomlq -it '.integration.mqtt.state_topic_template="us915_1/gateway/{{ .GatewayID }}/state/{{ .StateType }}"' /tmp/chirpstack-gateway-bridge.toml
+    tomlq -it '.integration.mqtt.command_topic_template="us915_1/gateway/{{ .GatewayID }}/command/#"' /tmp/chirpstack-gateway-bridge.toml
 
     # LOG LEVEL convert to number
     case "$gateway_bridge_log_level" in
