@@ -149,9 +149,12 @@ tomlq -it '.network.enabled_regions=["us915_1"]' /tmp/chirpstack.toml
 # Regions - configured in separate us915_1.toml file
 # ---------------------------------------------------------------------------
 
-# Create us915_1 region configuration file  
+# Create us915_1 region configuration file
+# FIXED: Using US915 Sub-band 1 (channels 8-15, 65) frequencies
+# to match Milesight UG56 gateway configuration
 cat > /config/chirpstack/region_us915_1.toml << 'EOF'
 # This file contains us915_1 configuration.
+# Configured for US915 Sub-band 1 (channels 8-15 + 65)
 [[regions]]
 
   # Name is an user-defined identifier for this region.
@@ -236,65 +239,74 @@ cat > /config/chirpstack/region_us915_1.toml << 'EOF'
     # Gateway channel configuration.
     #
     # Note: this configuration is only used in case the gateway is using the
-    # ChirpStack Concentratord daemon. In any other case, this configuration 
+    # ChirpStack Concentratord daemon. In any other case, this configuration
     # is ignored.
-[[regions.gateway.channels]]
-      frequency=902300000
+    #
+    # US915 Sub-band 1: Channels 8-15 (903.9 - 905.3 MHz, 125kHz)
+    #                   Channel 65 (905.0 MHz, 500kHz)
+    [[regions.gateway.channels]]
+      frequency=903900000
       bandwidth=125000
       modulation="LORA"
       spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=902500000
+      frequency=904100000
       bandwidth=125000
       modulation="LORA"
       spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=902700000
+      frequency=904300000
       bandwidth=125000
       modulation="LORA"
       spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=902900000
+      frequency=904500000
       bandwidth=125000
       modulation="LORA"
       spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=903100000
+      frequency=904700000
       bandwidth=125000
       modulation="LORA"
       spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=903300000
+      frequency=904900000
       bandwidth=125000
       modulation="LORA"
       spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=903500000
+      frequency=905100000
       bandwidth=125000
       modulation="LORA"
       spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=903700000
+      frequency=905300000
       bandwidth=125000
       modulation="LORA"
       spreading_factors=[7, 8, 9, 10]
 
     [[regions.gateway.channels]]
-      frequency=903000000
+      frequency=905000000
       bandwidth=500000
       modulation="LORA"
       spreading_factors=[8]
 
   # Region specific network configuration.
   [regions.network]
-    
+
+    # Restrict uplink channels to US915 Sub-band 1 only.
+    # Channels 8-15 (125kHz) + Channel 65 (500kHz)
+    # This ensures the sensor only transmits on frequencies the gateway
+    # is listening on.
+    enabled_uplink_channels=[8, 9, 10, 11, 12, 13, 14, 15, 65]
+
     # Installation margin (dB) used by the ADR engine.
     #
     # A higher number means that the network-server will keep more margin,
@@ -312,16 +324,17 @@ cat > /config/chirpstack/region_us915_1.toml << 'EOF'
     rx_window=0
 
     # RX1 delay (1 - 15 seconds).
-    rx1_delay=1
+    rx1_delay=5
 
     # RX1 data-rate offset
     rx1_dr_offset=0
 
     # RX2 data-rate
     rx2_dr=8
-    
+
     # RX2 frequency (Hz)
-    rx2_frequency=923300000
+    # Correct RX2 downlink frequency for US915 Sub-band 1
+    rx2_frequency=923900000
 
     # Prefer RX2 on RX1 data-rate less than.
     #
@@ -373,12 +386,12 @@ cat > /config/chirpstack/region_us915_1.toml << 'EOF'
       # 0  = roughly 17 minutes
       # 15 = about 1 year
       max_time_n=0
-    
+
 
     # Class-B configuration.
     [regions.network.class_b]
 
-      # Ping-slot data-rate. 
+      # Ping-slot data-rate.
       ping_slot_dr=0
 
       # Ping-slot frequency (Hz)
@@ -390,7 +403,7 @@ cat > /config/chirpstack/region_us915_1.toml << 'EOF'
 
     # Below is the common set of extra channels. Please make sure that these
     # channels are also supported by the gateways.
-   
+
 
 EOF
 
